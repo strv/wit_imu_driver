@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>wit_imu_driver</name>
+  <version>0.0.0</version>
+  <description>The driver package for IMU produced by WIT Motion</description>
+  <maintainer email="strv.analoger@gmail.com">strv</maintainer>
+  <license>BSD</license>
+  <author email="strv.analoger@gmail.com">strv</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roslint</build_depend>
+  <depend>roscpp</depend>
+
+  <export>
+  </export>
+</package>
