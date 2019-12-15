@@ -22,7 +22,7 @@ jobs:
             catkin build
       - checkout
       - save_cache:
-          key: ws-{{ .BuildNum }}
+          key: ws-{{ .Revision }}
           paths:
             - /opt/ros/${ROS_DISTRO}/share/
             - ~/catkin_ws/
@@ -31,7 +31,7 @@ jobs:
       name: default
     steps:
       - restore_cache:
-          key: ws-{{ .BuildNum }}
+          key: ws-{{ .Revision }}
       - run:
           name: catkin build
           command: |
