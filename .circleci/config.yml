@@ -5,7 +5,7 @@ executors:
     docker:
       - image: ros:kinetic-ros-core-xenial
 jobs:
-  build:
+  setup:
     executor:
       name: default
     steps:
@@ -21,9 +21,28 @@ jobs:
             catkin init
             catkin build
       - checkout
+      - save_cache:
+          key: ws-{{ .BuildNum }}
+          paths:
+            - /opt/ros/${ROS_DISTRO}/share/
+            - ~/catkin_ws/
+  build:
+    executor:
+      name: default
+    steps:
+      - restore_cache:
+          key: ws-{{ .BuildNum }}
       - run:
           name: catkin build
           command: |
             source ~/catkin_ws/devel/setup.bash
             rosdep install -y -i --from-paths ~/catkin_ws/src/
             catkin build --no-notify --no-status
+workflows:
+  version: 2
+  build-test:
+    jobs:
+      - setup
+      - build:
+          requires:
+            - setup
