@@ -31,6 +31,5 @@ target_link_libraries(wit_imu_driver
   ${PROJECT_NAME}_lib
 )
 
-#find_package(roslint REQUIRED)
 set(ROSLINT_CPP_OPTS "--filter=+,-build/c++11")
 roslint_cpp()
