@@ -4,11 +4,10 @@ executors:
     working_directory: ~/catkin_ws/src
     docker:
       - image: ros:kinetic-ros-core-xenial
-jobs:
-  setup:
-    executor:
-      name: default
+commands:
+  ros-setup:
     steps:
+      - checkout
       - run:
           name: Setup environment
           command: |
@@ -19,35 +18,35 @@ jobs:
             pip install -q catkin_tools
             cd ~/catkin_ws
             catkin init
-            catkin build
-      - checkout
       - run:
           name: Install ROS dependencies
           command: |
-            source ~/catkin_ws/devel/setup.bash
+            source /opt/ros/${ROS_DISTRO}/setup.bash
             rosdep install -y -i --from-paths ~/catkin_ws/src/
-      - save_cache:
-          key: ws-{{ .Revision }}
-          paths:
-            - /usr/bin
-            - /usr/local/bin
-            - /opt/ros/${ROS_DISTRO}/share/
-            - ~/catkin_ws/
+jobs:
   build:
     executor:
       name: default
     steps:
-      - restore_cache:
-          key: ws-{{ .Revision }}
+      - ros-setup
       - run:
           name: catkin build
           command: |
+            source /opt/ros/${ROS_DISTRO}/setup.bash
             catkin build --no-notify --no-status
+  roslint:
+    executor:
+      name: default
+    steps:
+      - ros-setup
+      - run:
+          name: roslint
+          command: |
+            source /opt/ros/${ROS_DISTRO}/setup.bash
+            catkin build --no-notify --no-status --catkin-make-args roslint
 workflows:
   version: 2
   build-test:
     jobs:
-      - setup
-      - build:
-          requires:
-            - setup
+      - build
+      - roslint
