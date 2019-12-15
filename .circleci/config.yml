@@ -1,8 +1,14 @@
 version: 2
+executors:
+    default:
+      working_directory: ~/catkin_ws/src
+      docker:
+        - image: ros:kinetic-ros-core-xenial
 jobs:
   build:
-    docker:
-      - image: ros:kinetic-ros-core-xenial
+    executor:
+      name: default
     steps:
+      - run: pwd
       - checkout
       - run: echo "hello world"
