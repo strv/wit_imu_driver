@@ -33,7 +33,8 @@ jobs:
           name: catkin build
           command: |
             source /opt/ros/${ROS_DISTRO}/setup.bash
-            catkin build --no-notify --no-status
+            cd ~/catkin_ws/src/${CIRCLE_PROJECT_REPONAME}
+            catkin build --no-notify --no-status --this
   roslint:
     executor:
       name: default
@@ -43,7 +44,8 @@ jobs:
           name: roslint
           command: |
             source /opt/ros/${ROS_DISTRO}/setup.bash
-            catkin build --no-notify --no-status --catkin-make-args roslint
+            cd ~/catkin_ws/src/${CIRCLE_PROJECT_REPONAME}
+            catkin build --no-notify --no-status --this --catkin-make-args roslint
 workflows:
   version: 2
   build-test:
