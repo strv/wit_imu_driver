@@ -9,25 +9,25 @@ jobs:
     executor:
       name: default
     steps:
-      - checkout
       - run:
           name: Setup environment
           command: |
             apt-get update -y
-            apt-get install -y wget
-            sh -c 'echo "deb http://packages.ros.org/ros/ubuntu `lsb_release -sc` main" > /etc/apt/sources.list.d/ros-latest.list'
-            wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
-            apt-get update -y
-            apt-get install -y python-catkin-tools
-      - run:
-          name: Update and install dependencies
-          command: |
-            apt-get update -y
             apt-get upgrade -y
-            rosdep install -y -i --from-paths .
+            apt-get install -y python-pip
+            pip install catkin_tools
       - run:
-          name: catkin_make
+          name: catkin_init
           command: |
             cd ~/catkin_ws
             catkin init
+            catkin build
+      - checkout
+      - run:
+          name: Update and install dependencies
+          command: rosdep install -y -i --from-paths ~/catkin_ws/src/
+      - run :
+          name: catkin_build
+          command: |
+            source ~/catkin_ws/devel/setup.bash
             catkin build --no-notify --no-status
