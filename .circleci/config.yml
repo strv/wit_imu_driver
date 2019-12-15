@@ -1,9 +1,9 @@
-version: 2
+version: 2.1
 executors:
-    default:
-      working_directory: ~/catkin_ws/src
-      docker:
-        - image: ros:kinetic-ros-core-xenial
+  default:
+    working_directory: ~/catkin_ws/src
+    docker:
+      - image: ros:kinetic-ros-core-xenial
 jobs:
   build:
     executor:
