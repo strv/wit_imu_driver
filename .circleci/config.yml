@@ -1,13 +1,15 @@
 version: 2.1
 executors:
   default:
-    working_directory: ~/catkin_ws/src
+    working_directory: ~/catkin_ws/src/${CIRCLE_PROJECT_REPONAME}
     docker:
       - image: ros:kinetic-ros-core-xenial
 commands:
   ros-setup:
     steps:
       - checkout
+      - run:
+          command: ls ~/catkin_ws/src
       - run:
           name: Setup environment
           command: |
