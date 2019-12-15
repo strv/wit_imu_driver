@@ -1,4 +1,11 @@
-#include "wit_imu_driver/wt901c.h"
+/*
+ * Copyright(c) 2019, strv
+ * All rights reserved.
+ */
+
+#include <wit_imu_driver/wt901c.h>
+
+#include <tf2/LinearMath/Quaternion.h>
 
 namespace wit_imu_driver
 {
@@ -12,7 +19,7 @@ Wt901c::Wt901c(const double co_gravity)
 {
 }
 
-void Wt901c::pushBytes( const std::vector<uint8_t>& bytes,
+void Wt901c::pushBytes(const std::vector<uint8_t>& bytes,
                         const size_t size,
                         const ros::Time& stamp)
 {
@@ -22,7 +29,7 @@ void Wt901c::pushBytes( const std::vector<uint8_t>& bytes,
         // Not enough data length
         return;
     }
-    while(buf_.size() >= 11)
+    while (buf_.size() >= 11)
     {
         if (buf_[0] != 0x55)
         {
@@ -57,7 +64,7 @@ void Wt901c::pushBytes( const std::vector<uint8_t>& bytes,
 
             case 0x53:
             {
-                double r,p,y;
+                double r, p, y;
                 r = co_pose_ * bytes2int(buf_[3], buf_[2]);
                 p = co_pose_ * bytes2int(buf_[5], buf_[4]);
                 y = co_pose_ * bytes2int(buf_[7], buf_[6]);
@@ -101,4 +108,4 @@ void Wt901c::pushBytes( const std::vector<uint8_t>& bytes,
     }
     return;
 }
-}   // wit_imu_driver
+}   // namespace wit_imu_driver

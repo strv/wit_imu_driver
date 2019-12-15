@@ -2,6 +2,7 @@
  * Copyright(c) 2019, strv
  * All rights reserved.
  */
+
 #ifndef WIT_IMU_DRIVER_WIT_IMU_H
 #define WIT_IMU_DRIVER_WIT_IMU_H
 
@@ -9,8 +10,8 @@
 #include <queue>
 
 #include <sensor_msgs/Imu.h>
-#include <sensor_msgs/Temperature.h>
 #include <sensor_msgs/MagneticField.h>
+#include <sensor_msgs/Temperature.h>
 
 namespace wit_imu_driver
 {
@@ -22,16 +23,19 @@ enum PRODUCT
 class WitImu
 {
 public:
-    WitImu(const double co_gravity, const size_t msg_buffer_size = 100)
+    explicit WitImu(const double co_gravity = 9.8, const size_t msg_buffer_size = 100)
     : buf_(1024)
     , co_gravity_(co_gravity)
     , msg_buf_max_(msg_buffer_size)
     {
     }
 
-    virtual void pushBytes( const std::vector<uint8_t>& bytes,
+    virtual void pushBytes(const std::vector<uint8_t>& bytes,
                             const size_t size,
-                            const ros::Time& stamp){};
+                            const ros::Time& stamp)
+    {
+    }
+
     bool popImuData(sensor_msgs::Imu* const p_msg)
     {
         if (imu_buf_.empty())
@@ -43,7 +47,7 @@ public:
         return true;
     };
 
-    size_t sizeImuData()
+    size_t sizeImuData() const
     {
         return imu_buf_.size();
     };
@@ -59,7 +63,7 @@ public:
         return true;
     };
 
-    size_t sizeTempData()
+    size_t sizeTempData() const
     {
         return temp_buf_.size();
     };
@@ -75,7 +79,7 @@ public:
         return true;
     };
 
-    size_t sizeMagData()
+    size_t sizeMagData() const
     {
         return mag_buf_.size();
     };
@@ -95,6 +99,6 @@ protected:
                 | (static_cast<uint16_t>(l) & 0x00FF));
     }
 };
-}   // wit_imu_driver
+}   // namespace wit_imu_driver
 
-#endif // WIT_IMU_DRIVER_WIT_IMU_H
+#endif  // WIT_IMU_DRIVER_WIT_IMU_H

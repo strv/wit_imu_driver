@@ -1,23 +1,27 @@
+/*
+ * Copyright(c) 2019, strv
+ * All rights reserved.
+ */
+
 #ifndef WIT_IMU_DRIVER_WT901C_H
 #define WIT_IMU_DRIVER_WT901C_H
 
-#include "wit_imu.h"
+#include <wit_imu_driver/wit_imu.h>
 
-#include <vector>
 #include <queue>
+#include <vector>
 
 #include <sensor_msgs/Imu.h>
-#include <sensor_msgs/Temperature.h>
 #include <sensor_msgs/MagneticField.h>
-#include <tf2/LinearMath/Quaternion.h>
+#include <sensor_msgs/Temperature.h>
 
 namespace wit_imu_driver
 {
 class Wt901c : public WitImu
 {
 public:
-    Wt901c(const double co_gravity);
-    void pushBytes( const std::vector<uint8_t>& bytes,
+    explicit Wt901c(const double co_gravity = 9.8);
+    void pushBytes(const std::vector<uint8_t>& bytes,
                     const size_t size,
                     const ros::Time& stamp);
 private:
@@ -30,6 +34,6 @@ private:
     const double co_mag_;
     const double co_pose_;
 };
-}   // wit_imu_driver
+}   // namespace wit_imu_driver
 
-#endif // WIT_IMU_DRIVER_WT901C_H
+#endif  // WIT_IMU_DRIVER_WT901C_H

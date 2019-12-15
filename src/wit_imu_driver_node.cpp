@@ -8,6 +8,8 @@
 #include <vector>
 #include <queue>
 #include <numeric>
+#include <string>
+#include <linux/serial.h>
 
 #include <ros/ros.h>
 #include <ros/console.h>
@@ -18,11 +20,10 @@
 #include <boost/asio.hpp>
 #include <boost/asio/buffer.hpp>
 #include <boost/bind.hpp>
-#include <linux/serial.h>
 #include <boost/shared_ptr.hpp>
 
-#include "wit_imu_driver/wit_imu.h"
-#include "wit_imu_driver/wt901c.h"
+#include <wit_imu_driver/wit_imu.h>
+#include <wit_imu_driver/wt901c.h>
 
 namespace wit_imu_driver
 {
@@ -234,7 +235,7 @@ private:
         wdg_.start();
     }
 };
-}   // wit_imu_driver
+}   // namespace wit_imu_driver
 
 int main(int argc, char** argv)
 {
