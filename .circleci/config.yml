@@ -8,9 +8,12 @@ commands:
   ros-setup:
     steps:
       - checkout:
-          path: ${CIRCLE_PROJECT_REPONAME}
+          path: ~/repo
       - run:
-          command: ls ~/catkin_ws/src
+          name: Move files
+          command: |
+            mkdir -p ~/catkin_ws/src/${CIRCLE_PROJECT_REPONAME}/
+            mv ~/repo/* ~/catkin_ws/src/${CIRCLE_PROJECT_REPONAME}/
       - run:
           name: Setup environment
           command: |
