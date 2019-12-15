@@ -11,13 +11,19 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Update and install dependencies
+          name: Setup environment
           command: |
+            apt-get update -y
+            apt-get install wget
             sh -c 'echo "deb http://packages.ros.org/ros/ubuntu `lsb_release -sc` main" > /etc/apt/sources.list.d/ros-latest.list'
             wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
             apt-get update -y
-            apt-get upgrade -y
             apt-get install python-catkin-tools
+      - run:
+          name: Update and install dependencies
+          command: |
+            apt-get update -y
+            apt-get upgrade -y
             rosdep install -y -i --from-paths .
       - run:
           name: catkin_make
