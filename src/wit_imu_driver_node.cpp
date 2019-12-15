@@ -77,8 +77,8 @@ class Wt901c : public WitImu
 public:
     Wt901c(const double co_gravity)
     : WitImu(co_gravity)
-    , co_acc_(co_gravity_ * 16.0 / 32768.0)
-    , co_avel_(M_PI * 2000.0 / 32768.0 / 180.0)
+    , co_acc_(co_gravity_ * -16.0 / 32768.0)
+    , co_avel_(M_PI * 2000.0 / (32768.0 * 180.0))
     {
     }
 
