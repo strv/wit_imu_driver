@@ -12,25 +12,18 @@ jobs:
       - run:
           name: Setup environment
           command: |
-            apt-get update -y
-            apt-get upgrade -y
-            apt-get install -y python-pip
-            pip install catkin_tools
-      - run:
-          name: catkin_init
-          command: |
-            cd ~/catkin_ws
             source /opt/ros/${ROS_DISTRO}/setup.bash
+            apt-get update -y -qq
+            apt-get upgrade -y -qq
+            apt-get install -y -qq python-pip
+            pip install -q catkin_tools
+            cd ~/catkin_ws
             catkin init
             catkin build
       - checkout
       - run:
-          name: Update and install dependencies
-          command: |
-            source /opt/ros/${ROS_DISTRO}/setup.bash
-            rosdep install -y -i --from-paths ~/catkin_ws/src/
-      - run :
-          name: catkin_build
+          name: catkin build
           command: |
             source ~/catkin_ws/devel/setup.bash
+            rosdep install -y -i --from-paths ~/catkin_ws/src/
             catkin build --no-notify --no-status
