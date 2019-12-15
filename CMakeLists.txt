@@ -4,18 +4,21 @@ add_compile_options(-std=c++11)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  sensor_msgs
+  tf2
 )
 
 find_package(Boost REQUIRED COMPONENTS system)
 
 catkin_package(
   INCLUDE_DIRS include
-  CATKIN_DEPENDS roscpp
+  #CATKIN_DEPENDS roscpp sensor_msgs
 )
 
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIRS}
 )
 
 add_executable(wit_imu_driver src/wit_imu_driver_node.cpp)
