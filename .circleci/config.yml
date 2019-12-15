@@ -14,11 +14,11 @@ jobs:
           name: Setup environment
           command: |
             apt-get update -y
-            apt-get install wget
+            apt-get install -y wget
             sh -c 'echo "deb http://packages.ros.org/ros/ubuntu `lsb_release -sc` main" > /etc/apt/sources.list.d/ros-latest.list'
             wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
             apt-get update -y
-            apt-get install python-catkin-tools
+            apt-get install -y python-catkin-tools
       - run:
           name: Update and install dependencies
           command: |
