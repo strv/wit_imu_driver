@@ -4,6 +4,7 @@ add_compile_options(-std=c++11)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  roslint
   sensor_msgs
   tf2
 )
@@ -30,6 +31,6 @@ target_link_libraries(wit_imu_driver
   ${PROJECT_NAME}_lib
 )
 
-find_package(roslint REQUIRED)
+#find_package(roslint REQUIRED)
 set(ROSLINT_CPP_OPTS "--filter=+,-build/c++11")
 roslint_cpp()
