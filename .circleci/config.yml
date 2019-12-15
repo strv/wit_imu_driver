@@ -20,12 +20,15 @@ jobs:
           name: catkin_init
           command: |
             cd ~/catkin_ws
+            source /opt/ros/${ROS_DISTRO}/setup.bash
             catkin init
             catkin build
       - checkout
       - run:
           name: Update and install dependencies
-          command: rosdep install -y -i --from-paths ~/catkin_ws/src/
+          command: |
+            source /opt/ros/${ROS_DISTRO}/setup.bash
+            rosdep install -y -i --from-paths ~/catkin_ws/src/
       - run :
           name: catkin_build
           command: |
