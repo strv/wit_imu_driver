@@ -6,18 +6,18 @@ jobs:
   build:
 
     runs-on: ros:kinetic-ros-core-xenial
-    
+
     steps:
     - uses: actions/checkout@v1
     - name: build
-        run: |
+      run: |
           source /opt/ros/$ROS_DISTRO/setup.bash
           mkdir -p ~/catkin_ws/src
           cd ~/catkin_ws
           catkin_make_isolated
           source devel/setup.bash
     - name: lint
-        run: |
+      run: |
           cd ~/catkin_ws
           catkin_make_isolated roslint
-          
+
