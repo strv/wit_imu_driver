@@ -12,7 +12,6 @@ find_package(Boost REQUIRED COMPONENTS system)
 
 catkin_package(
   INCLUDE_DIRS include
-  #CATKIN_DEPENDS roscpp sensor_msgs
 )
 
 include_directories(
@@ -21,10 +20,14 @@ include_directories(
   ${Boost_INCLUDE_DIRS}
 )
 
+add_library(${PROJECT_NAME}_lib src/wt901c.cpp)
+target_link_libraries(${PROJECT_NAME}_lib ${catkin_LIBRARIES})
+
 add_executable(wit_imu_driver src/wit_imu_driver_node.cpp)
 add_dependencies(wit_imu_driver ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 target_link_libraries(wit_imu_driver
   ${catkin_LIBRARIES}
+  ${PROJECT_NAME}_lib
 )
 
 find_package(roslint REQUIRED)
