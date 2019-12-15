@@ -21,6 +21,11 @@ jobs:
             catkin init
             catkin build
       - checkout
+      - run:
+          name: Install ROS dependencies
+          command: |
+            source ~/catkin_ws/devel/setup.bash
+            rosdep install -y -i --from-paths ~/catkin_ws/src/
       - save_cache:
           key: ws-{{ .Revision }}
           paths:
@@ -35,8 +40,6 @@ jobs:
       - run:
           name: catkin build
           command: |
-            source ~/catkin_ws/devel/setup.bash
-            rosdep install -y -i --from-paths ~/catkin_ws/src/
             catkin build --no-notify --no-status
 workflows:
   version: 2
