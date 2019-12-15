@@ -22,9 +22,10 @@ enum PRODUCT
 class WitImu
 {
 public:
-    WitImu(const double co_gravity)
+    WitImu(const double co_gravity, const size_t msg_buffer_size = 100)
     : buf_(1024)
     , co_gravity_(co_gravity)
+    , msg_buf_max_(msg_buffer_size)
     {
     }
 
@@ -47,10 +48,45 @@ public:
         return imu_buf_.size();
     };
 
+    bool popTempData(sensor_msgs::Temperature* const p_msg)
+    {
+        if (temp_buf_.empty())
+        {
+            return false;
+        }
+        *p_msg = temp_buf_.front();
+        temp_buf_.pop();
+        return true;
+    };
+
+    size_t sizeTempData()
+    {
+        return temp_buf_.size();
+    };
+
+    bool popMagData(sensor_msgs::MagneticField* const p_msg)
+    {
+        if (mag_buf_.empty())
+        {
+            return false;
+        }
+        *p_msg = mag_buf_.front();
+        mag_buf_.pop();
+        return true;
+    };
+
+    size_t sizeMagData()
+    {
+        return mag_buf_.size();
+    };
+
 protected:
-    double co_gravity_;
+    const double co_gravity_;
+    const size_t msg_buf_max_;
     std::vector<uint8_t> buf_;
     std::queue<sensor_msgs::Imu> imu_buf_;
+    std::queue<sensor_msgs::Temperature> temp_buf_;
+    std::queue<sensor_msgs::MagneticField> mag_buf_;
 
     static int bytes2int(const uint8_t h, const uint8_t l)
     {

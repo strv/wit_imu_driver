@@ -6,6 +6,9 @@ Wt901c::Wt901c(const double co_gravity)
     : WitImu(co_gravity)
     , co_acc_(co_gravity_ * -16.0 / 32768.0)
     , co_avel_(M_PI * 2000.0 / (32768.0 * 180.0))
+    , co_temp_(0.01)
+    , co_mag_(1.0)
+    , co_pose_(M_PI / 32768.0)
 {
 }
 
@@ -36,25 +39,28 @@ void Wt901c::pushBytes( const std::vector<uint8_t>& bytes,
         switch (buf_[1])
         {
             case 0x51:
-            work_imu_ = sensor_msgs::Imu();
             work_imu_.header.stamp = stamp;
             work_imu_.linear_acceleration.x = co_acc_ * bytes2int(buf_[3], buf_[2]);
             work_imu_.linear_acceleration.y = co_acc_ * bytes2int(buf_[5], buf_[4]);
             work_imu_.linear_acceleration.z = co_acc_ * bytes2int(buf_[7], buf_[6]);
+
+            work_temp_.header.stamp = stamp;
+            work_temp_.temperature = co_temp_ * bytes2int(buf_[9], buf_[8]);
             break;
 
             case 0x52:
             work_imu_.angular_velocity.x = co_avel_ * bytes2int(buf_[3], buf_[2]);
             work_imu_.angular_velocity.y = co_avel_ * bytes2int(buf_[5], buf_[4]);
             work_imu_.angular_velocity.z = co_avel_ * bytes2int(buf_[7], buf_[6]);
+            work_temp_.temperature += co_temp_ * bytes2int(buf_[9], buf_[8]);
             break;
 
             case 0x53:
             {
                 double r,p,y;
-                r = bytes2int(buf_[3], buf_[2]) * M_PI / 32768.0;
-                p = bytes2int(buf_[5], buf_[4]) * M_PI / 32768.0;
-                y = bytes2int(buf_[7], buf_[6]) * M_PI / 32768.0;
+                r = co_pose_ * bytes2int(buf_[3], buf_[2]);
+                p = co_pose_ * bytes2int(buf_[5], buf_[4]);
+                y = co_pose_ * bytes2int(buf_[7], buf_[6]);
                 tf2::Quaternion q;
                 q.setRPY(r, p, y);
                 q.normalize();
@@ -62,11 +68,33 @@ void Wt901c::pushBytes( const std::vector<uint8_t>& bytes,
                 work_imu_.orientation.y = q.y();
                 work_imu_.orientation.z = q.z();
                 work_imu_.orientation.w = q.w();
+                imu_buf_.push(work_imu_);
+                if (imu_buf_.size() >= msg_buf_max_)
+                {
+                    imu_buf_.pop();
+                }
             }
-            imu_buf_.push(work_imu_);
+            {
+                work_temp_.temperature += co_temp_ * bytes2int(buf_[9], buf_[8]);
+                work_temp_.temperature /= 3.0;
+                temp_buf_.push(work_temp_);
+                if (temp_buf_.size() >= msg_buf_max_)
+                {
+                    temp_buf_.pop();
+                }
+            }
             break;
 
             case 0x54:
+            work_mag_.header.stamp = stamp;
+            work_mag_.magnetic_field.x = co_mag_ * bytes2int(buf_[3], buf_[2]);
+            work_mag_.magnetic_field.y = co_mag_ * bytes2int(buf_[5], buf_[4]);
+            work_mag_.magnetic_field.z = co_mag_ * bytes2int(buf_[7], buf_[6]);
+            mag_buf_.push(work_mag_);
+            if (mag_buf_.size() >= msg_buf_max_)
+            {
+                mag_buf_.pop();
+            }
             break;
         }
         buf_.erase(buf_.cbegin(), buf_.cbegin() + 11);

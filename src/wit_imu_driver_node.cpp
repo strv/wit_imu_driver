@@ -21,7 +21,8 @@
 #include <linux/serial.h>
 #include <boost/shared_ptr.hpp>
 
-#include <wit_imu_driver/wt901c.h>
+#include "wit_imu_driver/wit_imu.h"
+#include "wit_imu_driver/wt901c.h"
 
 namespace wit_imu_driver
 {
@@ -38,8 +39,6 @@ public:
     , wdg_timeout_(0.5)
     , rx_buf_(1024)
     {
-        pub_imu_ = nh_.advertise<sensor_msgs::Imu>("data_raw", 10);
-        pub_temp_ = nh_.advertise<sensor_msgs::Temperature>("temperature", 10);
         pnh_.param<double>("gravity", co_gravity_, 9.797673);
         pnh_.param<std::string>("frame_id", frame_id_, "imu_link");
     }
@@ -111,6 +110,9 @@ public:
 
     bool spin()
     {
+        pub_imu_ = nh_.advertise<sensor_msgs::Imu>("data_raw", 10);
+        pub_temp_ = nh_.advertise<sensor_msgs::Temperature>("temperature", 10);
+        pub_mag_ = nh_.advertise<sensor_msgs::MagneticField>("mag", 10);
         ptr_imu_ = boost::make_shared<Wt901c>(Wt901c(co_gravity_));
         startRead();
         auto io_run = [this]()
@@ -132,6 +134,7 @@ private:
     ros::NodeHandle pnh_;
     ros::Publisher pub_imu_;
     ros::Publisher pub_temp_;
+    ros::Publisher pub_mag_;
     ros::Timer wdg_;
     ros::Duration wdg_timeout_;
     std::string frame_id_;
@@ -185,6 +188,20 @@ private:
                 ptr_imu_->popImuData(&msg);
                 msg.header.frame_id = frame_id_;
                 pub_imu_.publish(msg);
+            }
+            while (ptr_imu_->sizeTempData() != 0)
+            {
+                sensor_msgs::Temperature msg;
+                ptr_imu_->popTempData(&msg);
+                msg.header.frame_id = frame_id_;
+                pub_temp_.publish(msg);
+            }
+            while (ptr_imu_->sizeMagData() != 0)
+            {
+                sensor_msgs::MagneticField msg;
+                ptr_imu_->popMagData(&msg);
+                msg.header.frame_id = frame_id_;
+                pub_mag_.publish(msg);
             }
             startRead();
             resetWdg();
