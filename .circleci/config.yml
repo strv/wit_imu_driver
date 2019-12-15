@@ -1,0 +1,61 @@
+version: 2.1
+executors:
+  default:
+    working_directory: ~/catkin_ws/src/
+    docker:
+      - image: ros:kinetic-ros-core-xenial
+commands:
+  ros-setup:
+    steps:
+      - run:
+          name: Setup environment
+          command: |
+            source /opt/ros/${ROS_DISTRO}/setup.bash
+            apt-get update -y -qq
+            apt-get upgrade -y -qq
+            apt-get install -y -qq python-pip
+            pip install -q catkin_tools
+            cd ~/catkin_ws
+            catkin init
+            catkin build --no-notify --no-status
+      - checkout:
+          path: ~/repo
+      - run:
+          name: Move files
+          command: |
+            mkdir -p ~/catkin_ws/src/${CIRCLE_PROJECT_REPONAME}/
+            mv ~/repo/* ~/catkin_ws/src/${CIRCLE_PROJECT_REPONAME}/
+      - run:
+          name: Install ROS dependencies
+          command: |
+            source /opt/ros/${ROS_DISTRO}/setup.bash
+            rosdep install -y -i --from-paths ~/catkin_ws/src/
+jobs:
+  build:
+    executor:
+      name: default
+    steps:
+      - ros-setup
+      - run:
+          name: catkin build
+          command: |
+            source /opt/ros/${ROS_DISTRO}/setup.bash
+            cd ~/catkin_ws/src/${CIRCLE_PROJECT_REPONAME}
+            catkin build --no-notify --no-status --this
+  roslint:
+    executor:
+      name: default
+    steps:
+      - ros-setup
+      - run:
+          name: roslint
+          command: |
+            source /opt/ros/${ROS_DISTRO}/setup.bash
+            cd ~/catkin_ws/src/${CIRCLE_PROJECT_REPONAME}
+            catkin build --no-notify --no-status --this --catkin-make-args roslint
+workflows:
+  version: 2
+  build-test:
+    jobs:
+      - build
+      - roslint
