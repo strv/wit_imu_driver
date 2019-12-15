@@ -29,6 +29,8 @@ jobs:
       - save_cache:
           key: ws-{{ .Revision }}
           paths:
+            - /usr/bin
+            - /usr/local/bin
             - /opt/ros/${ROS_DISTRO}/share/
             - ~/catkin_ws/
   build:
