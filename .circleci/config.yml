@@ -1,0 +1,8 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: ros:kinetic-ros-core-xenial
+    steps:
+      - checkout
+      - run: echo "hello world"
