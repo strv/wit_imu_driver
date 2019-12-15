@@ -24,6 +24,7 @@ commands:
             pip install -q catkin_tools
             cd ~/catkin_ws
             catkin init
+            catkin build --no-notify --no-status
       - run:
           name: Install ROS dependencies
           command: |
