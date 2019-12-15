@@ -7,13 +7,6 @@ executors:
 commands:
   ros-setup:
     steps:
-      - checkout:
-          path: ~/repo
-      - run:
-          name: Move files
-          command: |
-            mkdir -p ~/catkin_ws/src/${CIRCLE_PROJECT_REPONAME}/
-            mv ~/repo/* ~/catkin_ws/src/${CIRCLE_PROJECT_REPONAME}/
       - run:
           name: Setup environment
           command: |
@@ -25,6 +18,13 @@ commands:
             cd ~/catkin_ws
             catkin init
             catkin build --no-notify --no-status
+      - checkout:
+          path: ~/repo
+      - run:
+          name: Move files
+          command: |
+            mkdir -p ~/catkin_ws/src/${CIRCLE_PROJECT_REPONAME}/
+            mv ~/repo/* ~/catkin_ws/src/${CIRCLE_PROJECT_REPONAME}/
       - run:
           name: Install ROS dependencies
           command: |
