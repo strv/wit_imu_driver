@@ -5,6 +5,12 @@
 
 #include <wit_imu_driver/wt901c.h>
 
+#include <queue>
+#include <vector>
+
+#include <sensor_msgs/Imu.h>
+#include <sensor_msgs/MagneticField.h>
+#include <sensor_msgs/Temperature.h>
 #include <tf2/LinearMath/Quaternion.h>
 
 namespace wit_imu_driver
