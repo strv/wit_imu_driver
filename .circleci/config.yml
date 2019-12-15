@@ -9,6 +9,6 @@ jobs:
     executor:
       name: default
     steps:
-      - run: pwd
       - checkout
-      - run: echo "hello world"
+      - run: rosdep install -y -i --from-paths .
+      - run: catkin_make_isolated
