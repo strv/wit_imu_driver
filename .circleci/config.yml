@@ -10,5 +10,14 @@ jobs:
       name: default
     steps:
       - checkout
-      - run: rosdep install -y -i --from-paths .
-      - run: catkin_make_isolated
+      - run:
+          name: Update and install dependencies
+          command: |
+            apt-get update
+            apt-get upgrade
+            rosdep install -y -i --from-paths .
+      - run:
+          name: catkin_make
+          command: |
+            cd ~/catkin_ws
+            catkin_make_isolated
