@@ -3,7 +3,6 @@
  * All rights reserved.
  */
 
-#include <functional>
 #include <mutex>
 #include <thread>
 #include <vector>
