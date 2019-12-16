@@ -16,6 +16,7 @@
 #include <sensor_msgs/Imu.h>
 #include <sensor_msgs/MagneticField.h>
 #include <sensor_msgs/Temperature.h>
+#include <std_srvs/Trigger.h>
 
 #include <boost/asio.hpp>
 #include <boost/asio/buffer.hpp>
@@ -42,6 +43,7 @@ public:
     {
         pnh_.param<double>("gravity", co_gravity_, 9.797673);
         pnh_.param<std::string>("frame_id", frame_id_, "imu_link");
+        pnh_.param<int>("product", product_, WitImu::PRODUCT::WT901C);
     }
 
     bool open()
@@ -111,10 +113,53 @@ public:
 
     bool spin()
     {
-        pub_imu_ = nh_.advertise<sensor_msgs::Imu>("data_raw", 10);
-        pub_temp_ = nh_.advertise<sensor_msgs::Temperature>("temperature", 10);
-        pub_mag_ = nh_.advertise<sensor_msgs::MagneticField>("mag", 10);
-        ptr_imu_ = boost::make_shared<Wt901c>(Wt901c(co_gravity_));
+        switch (product_)
+        {
+            case WitImu::PRODUCT::WT901C:
+            {
+                pub_imu_ = nh_.advertise<sensor_msgs::Imu>("data_raw", 10);
+                pub_temp_ = nh_.advertise<sensor_msgs::Temperature>("temperature", 10);
+                pub_mag_ = nh_.advertise<sensor_msgs::MagneticField>("mag", 10);
+                ptr_imu_ = boost::make_shared<Wt901c>(Wt901c(co_gravity_));
+                srv_trg_yaw_clr_ = pnh_.advertiseService<std_srvs::TriggerRequest, std_srvs::TriggerResponse>(
+                                        "trigger_yaw_clear",
+                                        boost::bind(
+                                            &WitImuDriver::cbSrvTrgWriteCommand,
+                                            this,
+                                            _1,
+                                            _2,
+                                            ptr_imu_->genYawClr()));
+                srv_trg_acc_cal_ = pnh_.advertiseService<std_srvs::TriggerRequest, std_srvs::TriggerResponse>(
+                                        "trigger_acc_calibration",
+                                        boost::bind(
+                                            &WitImuDriver::cbSrvTrgWriteCommand,
+                                            this,
+                                            _1,
+                                            _2,
+                                            ptr_imu_->genAccCal()));
+                srv_trg_mag_cal_ = pnh_.advertiseService<std_srvs::TriggerRequest, std_srvs::TriggerResponse>(
+                                        "trigger_mag_calibration",
+                                        boost::bind(
+                                            &WitImuDriver::cbSrvTrgWriteCommand,
+                                            this,
+                                            _1,
+                                            _2,
+                                            ptr_imu_->genMagCal()));
+                srv_trg_exit_cal_ = pnh_.advertiseService<std_srvs::TriggerRequest, std_srvs::TriggerResponse>(
+                                        "trigger_exit_calibration",
+                                        boost::bind(
+                                            &WitImuDriver::cbSrvTrgWriteCommand,
+                                            this,
+                                            _1,
+                                            _2,
+                                            ptr_imu_->genExitCal()));
+            }
+            break;
+
+            default:
+            ROS_ERROR("Product is not provided");
+            return false;
+        }
         startRead();
         auto io_run = [this]()
         {
@@ -136,6 +181,11 @@ private:
     ros::Publisher pub_imu_;
     ros::Publisher pub_temp_;
     ros::Publisher pub_mag_;
+    ros::ServiceServer srv_trg_yaw_clr_;
+    ros::ServiceServer srv_trg_height_clr_;
+    ros::ServiceServer srv_trg_acc_cal_;
+    ros::ServiceServer srv_trg_mag_cal_;
+    ros::ServiceServer srv_trg_exit_cal_;
     ros::Timer wdg_;
     ros::Duration wdg_timeout_;
     std::string frame_id_;
@@ -145,6 +195,7 @@ private:
     std::thread io_thread_;
 
     double co_gravity_;
+    int product_;
     std::vector<uint8_t> rx_buf_;
 
     boost::shared_ptr<WitImu> ptr_imu_;
@@ -219,6 +270,26 @@ private:
         }
     }
 
+
+
+    bool cbSrvTrgWriteCommand(std_srvs::TriggerRequest& req
+                                , std_srvs::TriggerResponse& res        // NOLINT
+                                , const std::vector<uint8_t>& bytes)
+    {
+        bool ret = sendBytes(bytes);
+        if (ret)
+        {
+            res.message = "Success";
+            res.success = true;
+        }
+        else
+        {
+            res.message = "Failed";
+            res.success = false;
+        }
+        return true;
+    }
+
     void cbWdg(const ros::TimerEvent& event)
     {
         if (port_.is_open())
@@ -233,6 +304,26 @@ private:
         wdg_.stop();
         wdg_.setPeriod(wdg_timeout_);
         wdg_.start();
+    }
+
+    bool sendBytes(const std::vector<uint8_t>& bytes)
+    {
+        boost::system::error_code ec;
+        const size_t w_len = ba::write(port_,
+                                    ba::buffer(bytes),
+                                    ec);
+        if (w_len != bytes.size())
+        {
+            ROS_WARN("Could not send full length of packet.");
+            return false;
+        }
+        else if (ec.value() != 0)
+        {
+            ROS_ERROR("Failed to write. Error code : %d",
+                    ec.value());
+            return false;
+        }
+        return true;
     }
 };
 }   // namespace wit_imu_driver

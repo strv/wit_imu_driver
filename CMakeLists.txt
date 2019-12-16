@@ -6,6 +6,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   roslint
   sensor_msgs
+  std_srvs
   tf2
 )
 
