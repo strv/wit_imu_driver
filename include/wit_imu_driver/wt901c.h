@@ -24,6 +24,11 @@ public:
     void pushBytes(const std::vector<uint8_t>& bytes,
                     const size_t size,
                     const ros::Time& stamp);
+    virtual std::vector<uint8_t> genYawClr() const;
+    virtual std::vector<uint8_t> genHightClr() const;
+    virtual std::vector<uint8_t> genAccCal() const;
+    virtual std::vector<uint8_t> genMagCal() const;
+    virtual std::vector<uint8_t> genExitCal() const;
 private:
     sensor_msgs::Imu work_imu_;
     sensor_msgs::Temperature work_temp_;

@@ -15,14 +15,15 @@
 
 namespace wit_imu_driver
 {
-enum PRODUCT
-{
-    WT901C
-};
 
 class WitImu
 {
 public:
+    enum PRODUCT
+    {
+        WT901C
+    };
+
     explicit WitImu(const double co_gravity = 9.8, const size_t msg_buffer_size = 100)
     : buf_(1024)
     , co_gravity_(co_gravity)
@@ -84,6 +85,11 @@ public:
         return mag_buf_.size();
     };
 
+    virtual std::vector<uint8_t> genYawClr() const = 0;
+    virtual std::vector<uint8_t> genHightClr() const = 0;
+    virtual std::vector<uint8_t> genAccCal() const = 0;
+    virtual std::vector<uint8_t> genMagCal() const = 0;
+    virtual std::vector<uint8_t> genExitCal() const = 0;
 protected:
     const double co_gravity_;
     const size_t msg_buf_max_;

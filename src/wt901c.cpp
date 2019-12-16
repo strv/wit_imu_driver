@@ -114,4 +114,30 @@ void Wt901c::pushBytes(const std::vector<uint8_t>& bytes,
     }
     return;
 }
+
+std::vector<uint8_t> Wt901c::genYawClr() const
+{
+    return std::vector<uint8_t>{0xFF, 0xAA, 0x01, 0x04, 0x00};
+}
+
+std::vector<uint8_t> Wt901c::genHightClr() const
+{
+    return std::vector<uint8_t>{0xFF, 0xAA, 0x01, 0x03, 0x00};
+}
+
+std::vector<uint8_t> Wt901c::genAccCal() const
+{
+    return std::vector<uint8_t>{0xFF, 0xAA, 0x01, 0x01, 0x00};
+}
+
+std::vector<uint8_t> Wt901c::genMagCal() const
+{
+    return std::vector<uint8_t>{0xFF, 0xAA, 0x01, 0x02, 0x00};
+}
+
+std::vector<uint8_t> Wt901c::genExitCal() const
+{
+    return std::vector<uint8_t>{0xFF, 0xAA, 0x01, 0x00, 0x00};
+}
+
 }   // namespace wit_imu_driver
